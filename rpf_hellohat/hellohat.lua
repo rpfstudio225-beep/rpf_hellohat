@@ -5,9 +5,9 @@ local dict = 'mech_loco_m@character@arthur@fidgets@hat@normal@unarmed@normal@lef
 local anim = 'hat_lhand_b'
 local enabled = false
 local speed = 4.0
-local control = `INPUT_SWITCH_SHOULDER` ---- B for handsup and B egain for lowver Hands
+local control = `INPUT_SWITCH_SHOULDER` ---- X for say hello with hat
 
-RegisterNetEvent('handsup:toggle')
+RegisterNetEvent('hellohat:toggle')
 
 function IsUsingKeyboard(padIndex)
     return Citizen.InvokeNative(0xA571D46727E2B718, padIndex)
@@ -17,48 +17,48 @@ function SwitchToUnarmed()
     GiveWeaponToPed_2(PlayerPedId(), `WEAPON_UNARMED`, 0, true, false, 0, false, 0.5, 1.0, 0, false, 0.0, false)
 end
 
-function RaiseHands()
+function RaiseHellohat()
     TaskPlayAnim(PlayerPedId(), dict, anim, speed, speed, -1, 25, 0, false, false, false, '', false)
 end
 
-function LowerHands()
+function LowerHellohat()
     StopAnimTask(PlayerPedId(), dict, anim, speed)
 end
 
-function ToggleRaiseHands()
+function ToggleRaiseHellohat()
     enabled = not enabled
 
     if not enabled then
-        LowerHands()
+        LowerHellohat()
     end
 end
 
-RegisterCommand('hellohat', function(source, args, raw)
-    ToggleRaiseHands()
+RegisterCommand('hh', function(source, args, raw)
+    ToggleRaiseHellohat()
 end, false)
 
-AddEventHandler('handsup:toggle', ToggleRaiseHands)
+AddEventHandler('hellohat:toggle', ToggleRaiseHellohat)
 
 AddEventHandler('onResourceStop', function(resource)
     if GetCurrentResourceName() == resource then
         enabled = false
-        LowerHands()
+        LowerHellohat()
     end
 end)
 
 Citizen.CreateThread(function()
     while true do
             if IsControlJustReleased(0, 0x8CC9CD42) then
-            ToggleRaiseHands()
+            ToggleRaiseHellohat()
             Wait(2000)
-            ToggleRaiseHands()
+            ToggleRaiseHellohat()
             end
         Citizen.Wait(0)
     end
 end)
 
 CreateThread(function()
-    TriggerEvent('chat:addSuggestion', '/handsup', 'Raise/lower your hands', {})
+    TriggerEvent('chat:addSuggestion', '/hh', {})
 
     RequestAnimDict(dict)
     while not HasAnimDictLoaded(dict) do
@@ -77,7 +77,7 @@ CreateThread(function()
             SwitchToUnarmed()
 
             if not IsEntityPlayingAnim(PlayerPedId(), dict, anim, 25) then
-                RaiseHands()
+                RaiseHellohat()
             end
         end
     end
